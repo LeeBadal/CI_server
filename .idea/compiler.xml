@@ -6,8 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="serverCI" />
+        <module name="CI_server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="CI_server" target="8" />
+      <module name="serverCI" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

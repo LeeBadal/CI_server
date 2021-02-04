@@ -1,6 +1,8 @@
 # Compiled class file
 *.class
 
+target/
+CI_server.iml
 # Log file
 *.log
 
