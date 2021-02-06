@@ -4,6 +4,7 @@ import javax.servlet.ServletException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.*;
 import java.util.stream.Collectors;
 
 
@@ -14,6 +15,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+
+
+
 
 /**
  Skeleton of a ContinuousIntegrationServer which acts as webhook
@@ -45,7 +50,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         testProject(new File("path")); //TODO: add path.
 
         // 4th Notify status on browser
-        notifyBrowser();
+        //notifyBrowser();
 
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
@@ -80,11 +85,17 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         */
     }
 
-    private void notifyBrowser() {
+
+    private void notifyBrowser() throws IOException, InterruptedException {
+        String gitTargetURL;
+        JSONObject commitStatus;
         /*
             TODO: Unimplemented method.
             Updates the browsers content with necessary information according to the lab description.
         */
+        //TODO set variables
+        //GitHubNotification.setStatus(commitStatus,gitTargetURL);
+
     }
 
     // used to start the CI server in command line
