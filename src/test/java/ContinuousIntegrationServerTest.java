@@ -10,7 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.Buffer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -19,10 +22,12 @@ class ContinuousIntegrationServerTest {
 
     private HttpServletRequest request;
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         request = new Mockito().mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("X-GitHub-Event")).thenReturn("push");
+        BufferedReader mockReader = new BufferedReader(new StringReader("{\"ref\":\"refs/heads/find_branch\"}"));
+        when(request.getReader()).thenReturn(mockReader);
     }
 
     @AfterEach
@@ -40,6 +45,12 @@ class ContinuousIntegrationServerTest {
             e.printStackTrace();
         }
     }
+    @Test
+    void validateRequestFalse() throws IOException, ParseException {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        when(request.getMethod()).thenReturn("GET");
+        assertNull(CIS.validateRequest(request));
 
+    }
 
 }

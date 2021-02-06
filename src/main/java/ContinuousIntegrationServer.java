@@ -50,7 +50,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
     }
-    //TODO Need to decide on type to return, preferably a map or json/DBobject
+    
     public JSONObject validateRequest(HttpServletRequest request) throws IOException, ParseException {
         if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
         String requestData = request.getReader().lines().collect(Collectors.joining());
