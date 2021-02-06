@@ -4,10 +4,16 @@ import javax.servlet.ServletException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
+
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  Skeleton of a ContinuousIntegrationServer which acts as webhook
@@ -23,6 +29,12 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         System.out.println(target);
 
+        try {
+            JSONObject requestInfo = validateRequest(request);
+            if(requestInfo==null) return; //TODO
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         // 1st clone your repository
         File gitRepo = cloneProject("Git-Https-String");// TODO: git https
 
@@ -38,7 +50,14 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
     }
+    //TODO Need to decide on type to return, preferably a map or json/DBobject
+    public JSONObject validateRequest(HttpServletRequest request) throws IOException, ParseException {
+        if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
+        String requestData = request.getReader().lines().collect(Collectors.joining());
+        JSONObject object = (JSONObject) new JSONParser().parse(requestData);
 
+        return object;
+    }
     private File cloneProject(String git_https) {
         /*
             TODO: Unimplemented method.
