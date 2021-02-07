@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -61,5 +62,31 @@ class ContinuousIntegrationServerTest {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         File file = CIS.cloneProject("https://github.com/heeenkie/CI_server_Test.git", "main");
         assertNotNull(file);
+    }
+    //Test that the createURL method returns the correct URL
+    @Test
+    void createURLTestCorrect() throws ParseException {
+        String objectString = "{\n" +
+                "  \"id\": 12095185365,\n" +
+                "  \"sha\": \"ff674cb9a662dd565040618ee8a9cb3031d4a2f3\",\n" +
+                "  \"name\": \"LeeBadal/CI_webhook\",\n" +
+                "  \"target_url\": null,\n" +
+                "}";
+        JSONObject object = (JSONObject) new JSONParser().parse(objectString);
+        String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        String gitTargetURL = "https://api.github.com/repos/LeeBadal/CI_webhook/statuses/ff674cb9a662dd565040618ee8a9cb3031d4a2f3?access_token=5e94ab893ade18b1304dc04dc41f0e384b94be5f";
+        assertEquals(gitTargetURL, CIS.createURL(object, token));
+
+    }
+    //Test that the createStatus method returns the correct object when the tests fail.
+    @Test
+    void createStatusTestFailureTest() {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        JSONObject testObj = new JSONObject();
+        String inputStatus = "test_failure";
+        testObj.put("state","failure");
+        testObj.put("description","The commit failed at the test stage.");
+        assertEquals(testObj, CIS.createStatus(inputStatus));
     }
 }
