@@ -62,5 +62,4 @@ class ContinuousIntegrationServerTest {
         File file = CIS.cloneProject("https://github.com/heeenkie/CI_server_Test.git", "main");
         assertNotNull(file);
     }
-
 }
