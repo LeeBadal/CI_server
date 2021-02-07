@@ -1,3 +1,4 @@
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -117,6 +118,18 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         //TODO set variables
         //GitHubNotification.setStatus(commitStatus,gitTargetURL);
 
+    }
+    /**
+     * Modifies a JSONObject to include: commit SHA, link to commit, status, date, commitUser and log.
+     * Makes a post request to expr.link API endpoint inserting the data in database
+     * @param githubData A JSONObject based on a GitHub commit webhook.
+     * @return void
+     */
+    private void insertDB(JSONObject githubData) throws IOException, InterruptedException {
+        String targetURL = "https://expr-link.herokuapp.com/CI_Server";
+        JSONObject dbData = new JSONObject();
+        //TODO fill dbData with data, see HttpTest for requirements
+        Http.makePost(targetURL,githubData);
     }
 
     /**
