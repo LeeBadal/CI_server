@@ -8,10 +8,13 @@ import java.net.*;
 import java.util.stream.Collectors;
 
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.json.simple.JSONArray;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -25,6 +28,8 @@ import org.json.simple.parser.ParseException;
  See the Jetty documentation for API documentation of those classes.
  */
 public class ContinuousIntegrationServer extends AbstractHandler {
+
+    @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
@@ -34,23 +39,33 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         System.out.println(target);
 
+
+        JSONObject requestInfo = null;
+        File localRepo = null;
         try {
-            JSONObject requestInfo = validateRequest(request);
-            if(requestInfo==null) return; //TODO
+            //1st validate
+            requestInfo = validateRequest(request);
+            if(requestInfo==null) return;
+
+            //2nd clone repo
+             localRepo = cloneProject("Git-Https-String", "branch");
+            if (localRepo == null) return;
+
         } catch (ParseException e) {
             e.printStackTrace();
+        } catch (GitAPIException e) {
+            e.printStackTrace();
         }
-        // 1st clone your repository
-        File gitRepo = cloneProject("Git-Https-String");// TODO: git https
 
-        // 2nd compile the code
-        buildProject(gitRepo);
+        // 3nd compile the code
+        buildProject(localRepo);
 
-        // 3rd testProject
+        // 4rd testProject
         testProject(new File("path")); //TODO: add path.
 
-        // 4th Notify status on browser
+        // 5th Notify status on browser
         //notifyBrowser();
+
 
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
@@ -63,12 +78,18 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         return object;
     }
-    private File cloneProject(String git_https) {
-        /*
-            TODO: Unimplemented method.
-            Clones a repository from https and returns the result as a file.
-        */
-        return null;
+    public File cloneProject(String git_https, String branch) throws GitAPIException, IOException {
+        File file = new File("Git");
+        FileUtils.deleteDirectory(file);
+        file = new File("Git");
+
+        Git.cloneRepository()
+                .setURI(git_https)
+                .setBranch(branch)
+                .setDirectory(file)
+                .call();
+
+        return file;
     }
 
     private void buildProject(File testFile) {

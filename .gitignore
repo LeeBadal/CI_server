@@ -3,6 +3,7 @@
 
 target/
 CI_server.iml
+Git/
 # Log file
 *.log
 
