@@ -2,6 +2,7 @@
 import javax.servlet.http.HttpServletRequest;
 
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.mockito.Mockito;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.Buffer;
@@ -44,6 +46,7 @@ class ContinuousIntegrationServerTest {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
     }
     @Test
     void validateRequestFalse() throws IOException, ParseException {
@@ -51,6 +54,13 @@ class ContinuousIntegrationServerTest {
         when(request.getMethod()).thenReturn("GET");
         assertNull(CIS.validateRequest(request));
 
+    }
+
+    @Test
+    void cloneProjectTrue() throws GitAPIException, IOException {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        File file = CIS.cloneProject("https://github.com/heeenkie/CI_server_Test.git", "main");
+        assertNotNull(file);
     }
 
 }
