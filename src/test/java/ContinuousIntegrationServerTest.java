@@ -79,4 +79,14 @@ class ContinuousIntegrationServerTest {
         assertEquals(gitTargetURL, CIS.createURL(object, token));
 
     }
+    //Test that the createStatus method returns the correct object when the tests fail.
+    @Test
+    void createStatusTestFailureTest() {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        JSONObject testObj = new JSONObject();
+        String inputStatus = "test_failure";
+        testObj.put("state","failure");
+        testObj.put("description","The commit failed at the test stage.");
+        assertEquals(testObj, CIS.createStatus(inputStatus));
+    }
 }
