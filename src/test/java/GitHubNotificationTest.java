@@ -39,4 +39,5 @@ public class GitHubNotificationTest {
         assertEquals(201,GitHubNotification.setStatus(testStatus,gitTargetURL));
 
     }
+
 }

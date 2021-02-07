@@ -64,8 +64,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         testProject(new File("path")); //TODO: add path.
 
         // 5th Notify status on browser
-        //notifyBrowser();
-
 
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
@@ -106,10 +104,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         */
     }
 
-
-    private void notifyBrowser() throws IOException, InterruptedException {
-        String gitTargetURL;
+    private void notifyBrowser(JSONObject githubData) throws IOException, InterruptedException {
+        String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
+        String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus;
+
 
         /*
             TODO: Unimplemented method.
@@ -118,6 +117,22 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         //TODO set variables
         //GitHubNotification.setStatus(commitStatus,gitTargetURL);
 
+    }
+
+    /**
+     * Returns the URL needed to set the status of a commit on github.
+     * @param requestInfo A JSONObject based on a GitHub commit webhook.
+     * @param token the personal access token
+     * @return the target URL for the setStatus Github API request
+     */
+    public String createURL(JSONObject requestInfo, String token) {
+        String gitTargetURL;
+        //TODO: Check - is this always the SHA for the commit or can it be something else such as the branch/pull request?
+        String sha = (String) requestInfo.get("sha");
+        Object repoName = requestInfo.get("name");
+        gitTargetURL = "https://api.github.com/repos/" + repoName + "/statuses/" + sha + "?access_token=" + token;
+
+        return gitTargetURL;
     }
 
     // used to start the CI server in command line
