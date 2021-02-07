@@ -110,6 +110,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     private void notifyBrowser() throws IOException, InterruptedException {
         String gitTargetURL;
         JSONObject commitStatus;
+
         /*
             TODO: Unimplemented method.
             Updates the browsers content with necessary information according to the lab description.
