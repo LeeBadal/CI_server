@@ -8,6 +8,7 @@ import java.net.*;
 import java.util.stream.Collectors;
 
 
+import junit.textui.TestRunner;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
@@ -51,14 +52,17 @@ public class ContinuousIntegrationServer extends AbstractHandler {
              localRepo = cloneProject("Git-Https-String", "branch");
             if (localRepo == null) return;
 
+            buildProject(localRepo);
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (GitAPIException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         // 3nd compile the code
-        buildProject(localRepo);
+
 
         // 4rd testProject
         testProject(new File("path")); //TODO: add path.
@@ -70,7 +74,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
     }
-    
+
     public JSONObject validateRequest(HttpServletRequest request) throws IOException, ParseException {
         if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
         String requestData = request.getReader().lines().collect(Collectors.joining());
@@ -92,11 +96,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         return file;
     }
 
-    private void buildProject(File testFile) {
-        /*
-            TODO: Unimplemented method.
-            Builds the project from the a file.
-        */
+    public void buildProject(File file) throws IOException, InterruptedException {
+        String path = file.getAbsolutePath();
+        Runtime.getRuntime().exec("mvn -f " + path + " test").waitFor();
     }
 
     private void testProject(File projectFile) {

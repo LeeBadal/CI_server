@@ -1,7 +1,6 @@
 
 import javax.servlet.http.HttpServletRequest;
 
-
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -15,7 +14,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.Buffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -62,4 +62,15 @@ class ContinuousIntegrationServerTest {
         File file = CIS.cloneProject("https://github.com/heeenkie/CI_server_Test.git", "main");
         assertNotNull(file);
     }
+
+    /*
+    @Test
+    void buildProjectTrue() throws IOException, InterruptedException, GitAPIException {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        File file = CIS.cloneProject("https://@github.com/LeeBadal/CI_server.git", "main");
+        CIS.buildProject(file);
+        assertTrue(Files.exists(Path.of("Git/target/surefire-reports/GitHubNotificationTest.txt")));
+    }
+    */
+
 }
