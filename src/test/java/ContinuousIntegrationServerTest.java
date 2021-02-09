@@ -60,7 +60,7 @@ class ContinuousIntegrationServerTest {
     @Test
     void cloneProjectTrue() throws GitAPIException, IOException {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
-        File file = CIS.cloneProject("https://github.com/heeenkie/CI_server_Test.git", "main");
+        File file = CIS.cloneProject("https://github.com/LeeBadal/CI_server.git", "main");
         assertNotNull(file);
     }
 

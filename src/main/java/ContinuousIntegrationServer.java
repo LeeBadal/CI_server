@@ -97,7 +97,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
     public void buildProject(File file) throws IOException, InterruptedException {
         String path = file.getAbsolutePath();
-        Runtime.getRuntime().exec("mvn -f " + path + " test").waitFor();
+        Runtime.getRuntime().exec("mvn -f " + path + " test --log-file log.txt").waitFor();
     }
 
     private void testProject(File projectFile) {
