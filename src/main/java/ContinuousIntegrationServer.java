@@ -45,7 +45,12 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             requestInfo = validateRequest(request);
             if(requestInfo==null) return;
 
-             localRepo = cloneProject("Git-Https-String", "branch");
+            //Unpack requestInfo to strings used in cloneProject
+            String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
+            String ref = (String) requestInfo.get("ref");
+            String branch = ref.substring(ref.lastIndexOf("/")+1);
+
+            localRepo = cloneProject(git_https, branch);
             if (localRepo == null) return;
 
             buildProject(localRepo);
