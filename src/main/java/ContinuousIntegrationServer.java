@@ -107,19 +107,14 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         */
     }
 
-    private void notifyBrowser(JSONObject githubData) throws IOException, InterruptedException {
-        String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
+    private void notifyBrowser(JSONObject githubData, String evaluationStatus) throws IOException, InterruptedException {
+        String token = "de8cc35a5232329c01d24e4ce378108085968eab";
+
         String gitTargetURL = createURL(githubData, token);
-        JSONObject commitStatus;
-
-
-        /*
-            TODO: Unimplemented method.
-            Updates the browsers content with necessary information according to the lab description.
-        */
-        //TODO set variables
-        //GitHubNotification.setStatus(commitStatus,gitTargetURL);
-
+        JSONObject commitStatus = createStatus(evaluationStatus);
+        //Update Github commit status
+        Http.makePost(gitTargetURL, commitStatus);
+        //TODO: add additional test/build data?
     }
     /**
      * Modifies a JSONObject to include: commit SHA, link to commit, status, date, commitUser and log.
