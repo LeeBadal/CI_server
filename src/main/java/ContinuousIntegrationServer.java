@@ -1,18 +1,15 @@
-import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 
-import junit.textui.TestRunner;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
@@ -23,9 +20,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-
-
 
 
 /**
@@ -48,11 +42,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         JSONObject requestInfo = null;
         File localRepo = null;
         try {
-            //1st validate
             requestInfo = validateRequest(request);
             if(requestInfo==null) return;
 
-            //2nd clone repo
              localRepo = cloneProject("Git-Https-String", "branch");
             if (localRepo == null) return;
 
@@ -65,21 +57,21 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             e.printStackTrace();
         }
 
-        // 3nd compile the code
-
-
-        // 4rd testProject
         testProject(new File("path")); //TODO: add path.
 
-        // 5th Notify status on browser
-
-        //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
 
         cleanUpFromCloneAndBuild();
 
     }
 
+    /**
+     * Checks and parses the data from the webhook into a JSON object.
+     * @param request
+     * @return JSONObject is an object with all the parsed data.
+     * @throws IOException
+     * @throws ParseException
+     */
     public JSONObject validateRequest(HttpServletRequest request) throws IOException, ParseException {
         if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
         String requestData = request.getReader().lines().collect(Collectors.joining());
@@ -88,6 +80,14 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         return object;
     }
 
+    /**
+     * Clones the project from Github into the folder Git.
+     * @param git_https is the string to the git repository.
+     * @param branch is the string to the branch name.
+     * @return cloned repository from git.
+     * @throws GitAPIException
+     * @throws IOException
+     */
     public File cloneProject(String git_https, String branch) throws GitAPIException, IOException {
         File file = new File("Git");
         FileUtils.deleteDirectory(file);
@@ -102,6 +102,12 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         return file;
     }
 
+    /**
+     * Builds the project and puts the result in a log.txt file in the root folder of the project.
+     * @param file the cloned repository.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public void buildProject(File file) throws IOException, InterruptedException {
         String path = file.getAbsolutePath();
         Runtime.getRuntime().exec("mvn -f " + path + " test --log-file log.txt").waitFor();
@@ -114,6 +120,13 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         */
     }
 
+    /**
+     * Updates the status of the commit for the git repository.
+     * @param githubData is data from the webhook created by the commit
+     * @param evaluationStatus The status of the build.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void notifyBrowser(JSONObject githubData, String evaluationStatus) throws IOException, InterruptedException {
         String token = "de8cc35a5232329c01d24e4ce378108085968eab";
 
