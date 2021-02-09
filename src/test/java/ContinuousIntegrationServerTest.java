@@ -1,6 +1,7 @@
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.when;
 class ContinuousIntegrationServerTest {
 
     private HttpServletRequest request;
+
     @BeforeEach
     void setUp() throws IOException {
         request = new Mockito().mock(HttpServletRequest.class);
@@ -86,9 +89,19 @@ class ContinuousIntegrationServerTest {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         JSONObject testObj = new JSONObject();
         String inputStatus = "test_failure";
-        testObj.put("state","failure");
-        testObj.put("description","The commit failed at the test stage.");
+        testObj.put("state", "failure");
+        testObj.put("description", "The commit failed at the test stage.");
         assertEquals(testObj, CIS.createStatus(inputStatus));
     }
 
+    //Test that cleanup from clone & build works and that files "Git" and log.txt is removed
+    @Test
+    void cleanUpFromCloneAndBuildTrue() throws IOException {
+        new File("Git").mkdir();
+        new File("log.txt").createNewFile();
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        CIS.cleanUpFromCloneAndBuild();
+        assertFalse(Files.exists(Paths.get("Git")));
+        assertFalse(Files.exists(Paths.get("log.txt")));
+    }
 }
