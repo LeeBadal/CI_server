@@ -1,7 +1,6 @@
 
 import javax.servlet.http.HttpServletRequest;
 
-
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,7 +15,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.Buffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -47,22 +47,23 @@ class ContinuousIntegrationServerTest {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
     }
+
     @Test
     void validateRequestFalse() throws IOException, ParseException {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         when(request.getMethod()).thenReturn("GET");
         assertNull(CIS.validateRequest(request));
-
     }
 
+    //Testing if the cloned file exists.
     @Test
     void cloneProjectTrue() throws GitAPIException, IOException {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
-        File file = CIS.cloneProject("https://github.com/heeenkie/CI_server_Test.git", "main");
+        File file = CIS.cloneProject("https://github.com/LeeBadal/CI_server.git", "main");
         assertNotNull(file);
     }
+
     //Test that the createURL method returns the correct URL
     @Test
     void createURLTestCorrect() throws ParseException {
@@ -77,8 +78,8 @@ class ContinuousIntegrationServerTest {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         String gitTargetURL = "https://api.github.com/repos/LeeBadal/CI_webhook/statuses/ff674cb9a662dd565040618ee8a9cb3031d4a2f3?access_token=5e94ab893ade18b1304dc04dc41f0e384b94be5f";
         assertEquals(gitTargetURL, CIS.createURL(object, token));
-
     }
+
     //Test that the createStatus method returns the correct object when the tests fail.
     @Test
     void createStatusTestFailureTest() {
@@ -89,4 +90,5 @@ class ContinuousIntegrationServerTest {
         testObj.put("description","The commit failed at the test stage.");
         assertEquals(testObj, CIS.createStatus(inputStatus));
     }
+
 }
