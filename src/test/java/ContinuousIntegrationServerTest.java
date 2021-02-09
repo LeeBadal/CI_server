@@ -1,7 +1,6 @@
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,10 +34,9 @@ class ContinuousIntegrationServerTest {
         when(request.getReader()).thenReturn(mockReader);
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
+    /**
+     * Checks if the generated object is a JSONObject.
+     */
     @Test
     void validateRequestTrue() {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
@@ -52,6 +49,11 @@ class ContinuousIntegrationServerTest {
         }
     }
 
+    /**
+     * Checks if the generated JSONObject is not null.
+     * @throws IOException
+     * @throws ParseException
+     */
     @Test
     void validateRequestFalse() throws IOException, ParseException {
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
