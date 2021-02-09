@@ -1,20 +1,20 @@
 import org.json.simple.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class GitHubNotificationTest {
+class GitHubNotificationTest {
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() {
     }
 
     @Test
@@ -26,7 +26,6 @@ public class GitHubNotificationTest {
         testStatus.put("state","success");
         testStatus.put("description","This is a test commit status update");
         assertEquals(201,GitHubNotification.setStatus(testStatus,gitTargetURL));
-
     }
 
     @Test
@@ -37,7 +36,6 @@ public class GitHubNotificationTest {
         testStatus.put("state","failure");
         testStatus.put("description","This is a test commit status update");
         assertEquals(201,GitHubNotification.setStatus(testStatus,gitTargetURL));
-
     }
 
 }
