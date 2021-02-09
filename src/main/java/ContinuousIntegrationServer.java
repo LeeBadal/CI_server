@@ -6,6 +6,9 @@ import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 
@@ -72,6 +75,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
+
+        cleanUpFromCloneAndBuild();
+
     }
 
     public JSONObject validateRequest(HttpServletRequest request) throws IOException, ParseException {
@@ -81,6 +87,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         return object;
     }
+
     public File cloneProject(String git_https, String branch) throws GitAPIException, IOException {
         File file = new File("Git");
         FileUtils.deleteDirectory(file);
@@ -172,6 +179,17 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
 
         return object;
+    }
+
+    /**
+     * Cleans up the repo from "log.txt" and "Git" directory after Clone and Build methods.
+     * @return void
+     */
+    public void cleanUpFromCloneAndBuild() throws IOException {
+        Path pathToDir = Paths.get("Git/");
+        if (Files.exists(pathToDir)) FileUtils.deleteDirectory(new File("Git"));
+        Path pathToLog = Paths.get("log.txt");
+        if (Files.exists(pathToLog)) (new File("log.txt")).delete();
     }
 
 
