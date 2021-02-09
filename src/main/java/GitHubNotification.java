@@ -18,17 +18,19 @@ public class GitHubNotification {
 
     private static int postRequest(String URL, Object body) throws IOException, InterruptedException {
 
+
+        //TODO: add to local file in gitignore
         String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
 
         //String url = "https://api.github.com/repos/LeeBadal/CI-server/statuses/{sha}";
-
+        String url = URL + "?access_token=" + token;
         // HttpClient Method to get Private Github content with Basic OAuth token
         //getGithubContentUsingHttpClient(token, url);
 
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL))
+                .uri(URI.create(url))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();

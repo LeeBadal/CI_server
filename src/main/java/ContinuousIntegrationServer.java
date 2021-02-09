@@ -1,3 +1,4 @@
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -68,8 +69,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         testProject(new File("path")); //TODO: add path.
 
         // 5th Notify status on browser
-        //notifyBrowser();
-
 
         //TODO: move to notifyBrowser method.
         response.getWriter().println("CI job done");
@@ -108,10 +107,12 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         */
     }
 
-
-    private void notifyBrowser() throws IOException, InterruptedException {
-        String gitTargetURL;
+    private void notifyBrowser(JSONObject githubData) throws IOException, InterruptedException {
+        String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
+        String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus;
+
+
         /*
             TODO: Unimplemented method.
             Updates the browsers content with necessary information according to the lab description.
@@ -120,6 +121,64 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         //GitHubNotification.setStatus(commitStatus,gitTargetURL);
 
     }
+    /**
+     * Modifies a JSONObject to include: commit SHA, link to commit, status, date, commitUser and log.
+     * Makes a post request to expr.link API endpoint inserting the data in database
+     * @param githubData A JSONObject based on a GitHub commit webhook.
+     * @return void
+     */
+    private void insertDB(JSONObject githubData) throws IOException, InterruptedException {
+        String targetURL = "https://expr-link.herokuapp.com/CI_Server";
+        JSONObject dbData = new JSONObject();
+        //TODO fill dbData with data, see HttpTest for requirements
+        Http.makePost(targetURL,githubData);
+    }
+
+    /**
+     * Returns the URL needed to set the status of a commit on github.
+     * @param requestInfo A JSONObject based on a GitHub commit webhook.
+     * @param token the personal access token
+     * @return the target URL for the setStatus Github API request
+     */
+    public String createURL(JSONObject requestInfo, String token) {
+        String gitTargetURL;
+        //TODO: Check - is this always the SHA for the commit or can it be something else such as the branch/pull request?
+        String sha = (String) requestInfo.get("sha");
+        Object repoName = requestInfo.get("name");
+        gitTargetURL = "https://api.github.com/repos/" + repoName + "/statuses/" + sha + "?access_token=" + token;
+
+        return gitTargetURL;
+    }
+
+    /**
+     * Create a JSONObject with state and description tags based on CI status.
+     * @param ciEvaluation a string describing the results of the CI process, either "success", "build_failure" or "test_failure".
+     * @return a JSONObject with state and description keys.
+     */
+    public JSONObject createStatus(String ciEvaluation) {
+        JSONObject object = new JSONObject();
+        switch (ciEvaluation) {
+            case "success":
+                object.put("state","success");
+                break;
+            case "build_failure":
+                object.put("state","failure");
+                //TODO: add extra build information if possible
+                object.put("description","The commit failed at the build stage.");
+                break;
+            case "test_failure":
+                object.put("state","failure");
+                //TODO: add extra test information if possible
+                object.put("description","The commit failed at the test stage.");
+                break;
+            default:
+                object.put("state","pending");
+                object.put("description","CI test status unknown.");
+        }
+
+        return object;
+    }
+
 
     // used to start the CI server in command line
     public static void main(String[] args) throws Exception {
