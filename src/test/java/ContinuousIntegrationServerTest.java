@@ -85,6 +85,28 @@ class ContinuousIntegrationServerTest {
         assertEquals(gitTargetURL, CIS.createURL(object, token));
     }
 
+    ///Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
+    @Test
+    void readLogFileFailTest() throws IOException {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        String log = "[INFO] Scanning for projects...\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
+        BufferedReader reader = new BufferedReader(new StringReader(log));
+        JSONObject logObject = CIS.createJSONLog(reader);
+        assertEquals("fail", logObject.get("status"));
+        assertEquals(log, logObject.get("log"));
+    }
+
+    //Check that createJSONlog sets status to pass when there are no errors, and that the log is correct.
+    @Test
+    void readLogFilePassTest() throws IOException {
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        String log = "[INFO] Scanning for projects...\n[INFO] BUILD SUCCESS\n[INFO] Total time:  4.306 s\n";
+        BufferedReader reader = new BufferedReader(new StringReader(log));
+        JSONObject logObject = CIS.createJSONLog(reader);
+        assertEquals("pass", logObject.get("status"));
+        assertEquals(log, logObject.get("log"));
+    }
+
     //Test that the createStatus method returns the correct object when the tests fail.
     @Test
     void createStatusTestFailureTest() {
