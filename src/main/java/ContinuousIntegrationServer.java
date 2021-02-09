@@ -111,7 +111,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus = createStatus(evaluationStatus);
         //Update Github commit status
-        GitHubNotification.setStatus(commitStatus, gitTargetURL);
+        Http.makePost(gitTargetURL, commitStatus);
         //TODO: add additional test/build data?
     }
     /**
