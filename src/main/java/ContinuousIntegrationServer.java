@@ -256,7 +256,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         Boolean buildSuccess = false;
         while ((s = logReader.readLine()) != null) {
             log.append(s);
-            log.append("<br/>");
+            log.append("<br>");
             if (s.matches("^\\[INFO\\]  T E S T S.*") && !fail) {
                 buildSuccess = true;
             }
