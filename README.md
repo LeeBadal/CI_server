@@ -7,7 +7,22 @@ Travis build status:
 [![Build Status](https://www.travis-ci.com/LeeBadal/CI_server.svg?token=7cmhVzehZexnVyrntj3T&branch=main)](https://www.travis-ci.com/LeeBadal/CI_server)
 
 CI_server build list:
-TODO: add a link here!
+[http://www.expr.link/img/expr-link.png](http://expr.link/builds/list/all)
+
+### How to run your CI_server
+- First you need to create a [PAT](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token), this is so that your commit status can be updated. NOTE: The status updates will be set by the PAT's user (make sure you have check the boxes for repo authorization).
+- Save the generated PAT in a file called token.txt in the root folder of the 
+- Using an IDE you can right click on the file ContinousIntegrationServer.java and run this file the server will run locally. The CI_server runs by default on port 8080.
+- To allow GitHub to interact with the server you will have to either configurate your network settings or use a tunneling service such as [Ngrok](https://ngrok.com/).
+
+
+You can then make POST requests and or visit the IP-adress to view all the builds created globally.
+
+### Connecting CI_server to your GitHub repo
+By visiting your repo and going to Settings -> Webhooks you can enter the CI-servers public IP.
+**That is it!**
+
+The implementation is dynamic and works for any public repository where the user of the PAT is a contributor.
 
 ### Project structure
  - **.idea**  Is Intellij specific folder, you do not need this folder if you are using a different IDEA
@@ -20,7 +35,7 @@ TODO: add a link here!
 To run the program you need the following software:
 
 * Java 11
-* Junit 5.x
+* Maven
 
 To actually get the right results by the server, your commited project needs on one of the following automated build tools:
 * Maven
@@ -37,6 +52,8 @@ All contributors have been part of the process such as code comments, system des
 
 ###### Lee Badal 
 - Team Leader
+- http methods
+- insertDB method
 
 ###### Daniel Grunler
 
