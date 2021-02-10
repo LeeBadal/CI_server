@@ -51,8 +51,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             JSONObject ciResults = new JSONObject();
             ciResults.put("state", "success");
             ciResults.put("log", "Logging operation successful.");
-            insertDB(requestInfo, ciResults);
-            notifyBrowser(requestInfo,"success");
+
             if(requestInfo==null) return;
 
             //Unpack requestInfo to strings used in cloneProject
@@ -63,7 +62,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             localRepo = cloneProject(git_https, branch);
             if (localRepo == null) return;
 
+            notifyBrowser(requestInfo, "pending");
             buildAndTestProject(localRepo);
+            insertDB(requestInfo, ciResults);
 
         } catch (ParseException e) {
             e.printStackTrace();
