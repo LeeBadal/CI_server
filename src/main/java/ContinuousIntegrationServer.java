@@ -65,15 +65,16 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
                 notifyBrowser(requestInfo, "pending");
                 buildAndTestProject(localRepo);
+                ciResults = readLogFile();
                 insertDB(requestInfo, ciResults);
-
+                notifyBrowser(requestInfo, ciResults.get("state").toString());
+                cleanUpFromCloneAndBuild();
             } catch (ParseException e) {
                 e.printStackTrace();
             } catch (GitAPIException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-
             }
         }
     }
@@ -245,11 +246,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             log.append("\n");
             if(s.matches("^\\[ERROR\\].*")  && !fail) {
                 fail = true;
-                logObject.put("status", "fail");
+                logObject.put("state", "failure");
             };
         }
         if (!fail) {
-            logObject.put("status", "pass");
+            logObject.put("state", "success");
         }
         logObject.put("log", log.toString());
         return logObject;

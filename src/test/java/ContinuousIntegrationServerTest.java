@@ -91,7 +91,7 @@ class ContinuousIntegrationServerTest {
         String log = "[INFO] Scanning for projects...\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
-        assertEquals("fail", logObject.get("status"));
+        assertEquals("failure", logObject.get("state"));
         assertEquals(log, logObject.get("log"));
     }
 
@@ -101,7 +101,7 @@ class ContinuousIntegrationServerTest {
         String log = "[INFO] Scanning for projects...\n[INFO] BUILD SUCCESS\n[INFO] Total time:  4.306 s\n";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
-        assertEquals("pass", logObject.get("status"));
+        assertEquals("success", logObject.get("state"));
         assertEquals(log, logObject.get("log"));
     }
 
