@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-class ContinuousIntegrationServerTest {
+public class ContinuousIntegrationServerTest {
 
     private HttpServletRequest request;
 
