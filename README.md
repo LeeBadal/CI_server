@@ -6,6 +6,8 @@ CI Server is created for the assignment 'Continuous Integration' in the course D
 Travis build status:
 [![Build Status](https://www.travis-ci.com/LeeBadal/CI_server.svg?token=7cmhVzehZexnVyrntj3T&branch=main)](https://www.travis-ci.com/LeeBadal/CI_server)
 
+[JavaDoc](https://leebadal.github.io/CI_server/package-summary.html)
+
 CI_server build list:
 [http://www.expr.link/img/expr-link.png](http://expr.link/builds/list/all)
 
