@@ -2,6 +2,11 @@
 ### Group 3, Spring 2021
 
 CI Server is created for the assignment 'Continuous Integration' in the course DD2480 at KTH. The Program runs a server which has a listener for webhooks. Webhooks from GitHub's commits are considered valid and is further processed. In the process the project is built, tested and evaluated to later notify the user via GitHub statuses. Build and test results are stored in an external database for a history overview.
+### Grade aspirations
+The group aims for P+, the motivations for this are:
+- A build list that persists that server restart is implemented, this was achieved by using an external API-endpoint connected to a MongoDB cluster.
+- The CI Server is dynamic, eg. it works on any repo/branch as it reads from this information from the GitHub POST request
+- Most commits(around 90%) are linked to issues.
 
 Travis build status:
 [![Build Status](https://www.travis-ci.com/LeeBadal/CI_server.svg?token=7cmhVzehZexnVyrntj3T&branch=main)](https://www.travis-ci.com/LeeBadal/CI_server)
@@ -9,7 +14,7 @@ Travis build status:
 [JavaDoc](https://leebadal.github.io/CI_server/package-summary.html)
 
 CI_server build list:
-[http://www.expr.link/img/expr-link.png](http://expr.link/builds/list/all)
+[![expr.link-img](http://www.expr.link/img/expr-link.png)](http://expr.link/builds/list/all)
 
 ### How to run your CI_server
 - git clone/download this repo
@@ -38,10 +43,10 @@ The implementation is dynamic and works for any public repository where the user
 To run the program you need the following software:
 
 * Java 11
-* Maven
+* Maven 3
 
 To actually get the right results by the server, your commited project needs on one of the following automated build tools:
-* Maven
+* Maven 3
 
 ### Running tests
 To run the tests you need the software under [requirements](#requirements). And knowledge of how to run a java program in a IDE.
@@ -49,6 +54,11 @@ To run the tests you need the software under [requirements](#requirements). And 
 1. Download/clone repo
 2. Make sure you have all the requirements and a working java IDE.
 3. Go to the test folder run tests accordingly to your java editor
+**Alternative if you have maven:** Download/clone the repo, run "mvn test".
+
+#### How testing is done
+- Junit 
+- Mockito
 
 ## List of contributions
 All contributors have been part of the process such as code comments, system design and are satisfied with the eachothers contributions.
