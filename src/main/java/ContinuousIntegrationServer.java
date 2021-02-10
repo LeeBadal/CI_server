@@ -63,7 +63,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             localRepo = cloneProject(git_https, branch);
             if (localRepo == null) return;
 
-            //buildProject(localRepo); //TODO: remove comment out
+            buildAndTestProject(localRepo);
+
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (GitAPIException e) {
@@ -71,9 +72,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-        testProject(new File("path")); //TODO: add path.
 
         response.getWriter().println("CI job done");
 
@@ -124,16 +122,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void buildProject(File file) throws IOException, InterruptedException {
+    public void buildAndTestProject(File file) throws IOException, InterruptedException {
         String path = file.getAbsolutePath();
         Runtime.getRuntime().exec("mvn -f " + path + " test --log-file log.txt").waitFor();
-    }
-
-    private void testProject(File projectFile) {
-        /*
-            TODO: Unimplemented method.
-            The building of the project will create a folder containing the test results which needs to be parsed in this method.
-        */
     }
 
     /**
@@ -154,6 +145,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         System.out.println(statusCode);
         //TODO: add additional test/build data?
     }
+
     /**
      * Modifies a JSONObject to include: commit SHA, link to commit, status, date, commitUser and log.
      * Makes a post request to expr.link API endpoint inserting the data in database
@@ -275,7 +267,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         Path pathToLog = Paths.get("log.txt");
         if (Files.exists(pathToLog)) (new File("log.txt")).delete();
     }
-
 
     // used to start the CI server in command line
     public static void main(String[] args) throws Exception {
