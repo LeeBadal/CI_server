@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"<Unnamed>","l":"ContinuousIntegrationServer"},{"p":"<Unnamed>","l":"Http"},{"p":"<Unnamed>","l":"HttpTest"},{"p":"<Unnamed>","l":"Utils"}]
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"<Unnamed>","l":"ContinuousIntegrationServer"},{"p":"<Unnamed>","l":"ContinuousIntegrationServerTest"},{"p":"<Unnamed>","l":"Http"},{"p":"<Unnamed>","l":"HttpTest"},{"p":"<Unnamed>","l":"Utils"}]
