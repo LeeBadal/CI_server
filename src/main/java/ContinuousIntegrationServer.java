@@ -6,6 +6,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.*;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,11 +44,14 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         System.out.println(target);
 
-
         JSONObject requestInfo = null;
         File localRepo = null;
         try {
             requestInfo = validateRequest(request);
+            JSONObject ciResults = new JSONObject();
+            ciResults.put("state", "success");
+            ciResults.put("log", "Logging operation successful.");
+
             if(requestInfo==null) return;
 
             //Unpack requestInfo to strings used in cloneProject
@@ -54,8 +61,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
             localRepo = cloneProject(git_https, branch);
             if (localRepo == null) return;
+
             notifyBrowser(requestInfo, "pending");
-            buildProject(localRepo);
+            buildAndTestProject(localRepo);
+            insertDB(requestInfo, ciResults);
+
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (GitAPIException e) {
@@ -64,8 +74,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             e.printStackTrace();
         }
 
-        testProject(new File("path")); //TODO: add path.
-        
         response.getWriter().println("CI job done");
 
         cleanUpFromCloneAndBuild();
@@ -83,7 +91,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
         String requestData = request.getReader().lines().collect(Collectors.joining());
         JSONObject object = (JSONObject) new JSONParser().parse(requestData);
-
+        System.out.println("RequestInfo = " + object.toJSONString());
         return object;
     }
 
@@ -115,16 +123,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void buildProject(File file) throws IOException, InterruptedException {
+    public void buildAndTestProject(File file) throws IOException, InterruptedException {
         String path = file.getAbsolutePath();
         Runtime.getRuntime().exec("mvn -f " + path + " test --log-file log.txt").waitFor();
-    }
-
-    private void testProject(File projectFile) {
-        /*
-            TODO: Unimplemented method.
-            The building of the project will create a folder containing the test results which needs to be parsed in this method.
-        */
     }
 
     /**
@@ -135,25 +136,42 @@ public class ContinuousIntegrationServer extends AbstractHandler {
      * @throws InterruptedException
      */
     private void notifyBrowser(JSONObject githubData, String evaluationStatus) throws IOException, InterruptedException {
-        String token = "de8cc35a5232329c01d24e4ce378108085968eab";
-
+        String token = "token"; //TODO: hidden variable in file
         String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus = createStatus(evaluationStatus);
+        System.out.println(commitStatus);
+        System.out.println(gitTargetURL);
         //Update Github commit status
-        Http.makePost(gitTargetURL, commitStatus);
+        int statusCode = Http.makePost(gitTargetURL, commitStatus);
+        System.out.println(statusCode);
         //TODO: add additional test/build data?
     }
+
     /**
      * Modifies a JSONObject to include: commit SHA, link to commit, status, date, commitUser and log.
      * Makes a post request to expr.link API endpoint inserting the data in database
      * @param githubData A JSONObject based on a GitHub commit webhook.
      * @return void
      */
-    private void insertDB(JSONObject githubData) throws IOException, InterruptedException {
+    private void insertDB(JSONObject githubData, JSONObject CIData) throws IOException, InterruptedException {
         String targetURL = "https://expr-link.herokuapp.com/CI_Server";
-        JSONObject dbData = new JSONObject();
+        JSONObject body = new JSONObject();
+        JSONObject commit = (JSONObject) githubData.get("head_commit");
+        body.put("SHA",commit.get("id"));
+        body.put("status",CIData.get("state"));
+        body.put("link",commit.get("url"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z"); //https://mkyong.com/java/java-how-to-get-current-date-time-date-and-calender/
+        Date date = new Date(System.currentTimeMillis());
+        body.put("date", dateFormat.format(date));
+
+        JSONObject author = (JSONObject) commit.get("author");
+        body.put("commiter", author.get("username"));
+        System.out.println(body.toString());
+        body.put("log",CIData.get("log"));
+        System.out.println(body.toString());
+
         //TODO fill dbData with data, see HttpTest for requirements
-        Http.makePost(targetURL,githubData);
+        Http.makePost(targetURL,body);
     }
 
     /**
@@ -165,10 +183,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     public String createURL(JSONObject requestInfo, String token) {
         String gitTargetURL;
         //TODO: Check - is this always the SHA for the commit or can it be something else such as the branch/pull request?
-        String sha = (String) requestInfo.get("sha");
-        Object repoName = requestInfo.get("name");
+        JSONObject commit = (JSONObject) requestInfo.get("head_commit");
+        String sha = (String) commit.get("id");
+        JSONObject repository = (JSONObject) requestInfo.get("repository");
+        String repoName = (String) repository.get("full_name");
         gitTargetURL = "https://api.github.com/repos/" + repoName + "/statuses/" + sha + "?access_token=" + token;
-
         return gitTargetURL;
     }
 
@@ -182,6 +201,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         switch (ciEvaluation) {
             case "success":
                 object.put("state","success");
+                object.put("description","The build and tests were successful.");
                 break;
             case "build_failure":
                 object.put("state","failure");
@@ -197,7 +217,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                 object.put("state","pending");
                 object.put("description","CI test status unknown.");
         }
-
         return object;
     }
 
@@ -249,7 +268,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         Path pathToLog = Paths.get("log.txt");
         if (Files.exists(pathToLog)) (new File("log.txt")).delete();
     }
-
 
     // used to start the CI server in command line
     public static void main(String[] args) throws Exception {

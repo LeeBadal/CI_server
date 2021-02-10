@@ -72,13 +72,15 @@ class ContinuousIntegrationServerTest {
     //Test that the createURL method returns the correct URL
     @Test
     void createURLTestCorrect() throws ParseException {
-        String objectString = "{\n" +
-                "  \"id\": 12095185365,\n" +
-                "  \"sha\": \"ff674cb9a662dd565040618ee8a9cb3031d4a2f3\",\n" +
-                "  \"name\": \"LeeBadal/CI_webhook\",\n" +
-                "  \"target_url\": null,\n" +
-                "}";
-        JSONObject object = (JSONObject) new JSONParser().parse(objectString);
+        JSONObject repo = new JSONObject();
+        repo.put("full_name","LeeBadal/CI_webhook");
+
+        JSONObject headCommit = new JSONObject();
+        headCommit.put("id","ff674cb9a662dd565040618ee8a9cb3031d4a2f3"); //sha
+
+        JSONObject object = new JSONObject();
+        object.put("repository",repo);
+        object.put("head_commit", headCommit);
         String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
         ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         String gitTargetURL = "https://api.github.com/repos/LeeBadal/CI_webhook/statuses/ff674cb9a662dd565040618ee8a9cb3031d4a2f3?access_token=5e94ab893ade18b1304dc04dc41f0e384b94be5f";
