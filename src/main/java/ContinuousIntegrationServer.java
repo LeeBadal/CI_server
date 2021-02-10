@@ -31,7 +31,6 @@ import org.json.simple.parser.ParseException;
  See the Jetty documentation for API documentation of those classes.
  */
 public class ContinuousIntegrationServer extends AbstractHandler {
-    private String personalAccessToken;
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
