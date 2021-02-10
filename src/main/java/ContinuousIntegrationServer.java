@@ -6,9 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.*;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,47 +43,36 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         JSONObject requestInfo = null;
         File localRepo = null;
-        String token = "";
-        try {
-            token = readFirstLineOfFile("token.txt");
-        } catch (IOException e) {
-            System.out.println("IO exception reaching token.");
-            e.printStackTrace();
+        if(request.getMethod().equals("GET")) response.sendRedirect("http://expr.link/builds/list/all");
+        else {
+            try {
+                requestInfo = validateRequest(request);
+                JSONObject ciResults = new JSONObject();
+
+                if (requestInfo == null) return;
+
+                //Unpack requestInfo to strings used in cloneProject
+                String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
+                String ref = (String) requestInfo.get("ref");
+                String branch = ref.substring(ref.lastIndexOf("/") + 1);
+
+                localRepo = cloneProject(git_https, branch);
+                if (localRepo == null) return;
+
+                notifyBrowser(requestInfo, "pending");
+                buildAndTestProject(localRepo);
+                ciResults = readLogFile();
+                insertDB(requestInfo, ciResults);
+                notifyBrowser(requestInfo, ciResults.get("state").toString());
+                cleanUpFromCloneAndBuild();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (GitAPIException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            requestInfo = validateRequest(request);
-            JSONObject ciResults = new JSONObject();
-
-
-
-            ciResults.put("state", "success");
-            ciResults.put("log", "Logging operation successful.");
-
-            if(requestInfo==null) return;
-            //Unpack requestInfo to strings used in cloneProject
-            String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
-            String ref = (String) requestInfo.get("ref");
-            String branch = ref.substring(ref.lastIndexOf("/")+1);
-
-            localRepo = cloneProject(git_https, branch);
-            if (localRepo == null) return;
-
-
-            notifyBrowser(requestInfo, "pending");
-            buildAndTestProject(localRepo);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        response.getWriter().println("CI job done");
-
-        cleanUpFromCloneAndBuild();
-
     }
 
     /**
@@ -98,34 +85,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         BufferedReader fileReader = new BufferedReader(new FileReader(filePath));
         return fileReader.readLine();
     }
-
-    /**
-     * Helpmethod for creating a JSONObject from the logfile.
-     * @param logReader
-     * @return JSONObject with log
-     * @throws IOException
-     */
-    public JSONObject createJSONLog(BufferedReader logReader) throws IOException {
-        StringBuilder log = new StringBuilder();
-        String s;
-        JSONObject logObject = new JSONObject();
-        Boolean fail = false;
-        while ((s = logReader.readLine()) != null) {
-            log.append(s);
-            log.append("\n");
-            if(s.matches("^\\[ERROR\\].*")  && !fail) {
-                fail = true;
-                logObject.put("status", "fail");
-            };
-        }
-        if (!fail) {
-            logObject.put("status", "pass");
-        }
-        logObject.put("log", log.toString());
-        return logObject;
-    }
-
-
 
     /**
      * Checks and parses the data from the webhook into a JSON object.
@@ -182,7 +141,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
      * @throws InterruptedException
      */
     private void notifyBrowser(JSONObject githubData, String evaluationStatus) throws IOException, InterruptedException {
-        String token = "token"; //TODO: hidden variable in file
+
+        String token = readFirstLineOfFile("token.txt");
         String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus = createStatus(evaluationStatus);
         System.out.println(commitStatus);
@@ -279,6 +239,35 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Helpmethod for creating a JSONObject from the logfile.
+     * @param logReader
+     * @return JSONObject with log
+     * @throws IOException
+     */
+    public JSONObject createJSONLog(BufferedReader logReader) throws IOException {
+        StringBuilder log = new StringBuilder();
+        String s;
+        JSONObject logObject = new JSONObject();
+        Boolean fail = false;
+        while ((s = logReader.readLine()) != null) {
+            log.append(s);
+            log.append("\n");
+            if(s.matches("^\\[ERROR\\].*")  && !fail) {
+                fail = true;
+                logObject.put("state", "failure");
+            };
+        }
+        if (!fail) {
+            logObject.put("state", "success");
+        }
+        logObject.put("log", log.toString());
+        return logObject;
+    }
+
+    /**
+>>>>>>> main
      * Cleans up the repo from "log.txt" and "Git" directory after Clone and Build methods.
      * @return void
      */
