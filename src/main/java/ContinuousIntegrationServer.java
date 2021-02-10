@@ -50,8 +50,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                 JSONObject ciResults = new JSONObject();
 
                 if (requestInfo == null) return;
+                if (requestInfo.get("head_commit") == null) return;
 
-                //Unpack requestInfo to strings used in cloneProject
+                 //Unpack requestInfo to strings used in cloneProject
                 String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
                 String ref = (String) requestInfo.get("ref");
                 String branch = ref.substring(ref.lastIndexOf("/") + 1);
