@@ -78,7 +78,10 @@ All contributors have been part of the process such as code comments, system des
 - JavaDoc
  
 ###### Olle Hovmark
-
+- Handling notifications to browser
+- Parsing of log file
+- Fixing method calls from handle function
+- Dynamic URL handling
   
   
   
