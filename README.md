@@ -59,7 +59,10 @@ All contributors have been part of the process such as code comments, system des
 
 
 ###### Matilda Rosenlew
-
+- Pairprogrammed with Andreas Henriksson
+- Clone method
+- Build and Test methods
+- Cleanup
 
 ###### Andreas Henriksson
 
