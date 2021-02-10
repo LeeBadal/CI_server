@@ -33,11 +33,10 @@ import org.json.simple.parser.ParseException;
  See the Jetty documentation for API documentation of those classes.
  */
 public class ContinuousIntegrationServer extends AbstractHandler {
-
+    private String personalAccessToken;
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
@@ -46,14 +45,23 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         JSONObject requestInfo = null;
         File localRepo = null;
+        String token = "";
+        try {
+            token = readFirstLineOfFile("token.txt");
+        } catch (IOException e) {
+            System.out.println("IO exception reaching token.");
+            e.printStackTrace();
+        }
         try {
             requestInfo = validateRequest(request);
             JSONObject ciResults = new JSONObject();
+
+
+
             ciResults.put("state", "success");
             ciResults.put("log", "Logging operation successful.");
 
             if(requestInfo==null) return;
-
             //Unpack requestInfo to strings used in cloneProject
             String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
             String ref = (String) requestInfo.get("ref");
@@ -62,9 +70,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             localRepo = cloneProject(git_https, branch);
             if (localRepo == null) return;
 
+
             notifyBrowser(requestInfo, "pending");
             buildAndTestProject(localRepo);
-            insertDB(requestInfo, ciResults);
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -81,6 +89,45 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
+     * Returns the first line of a file as a String.
+     * @param filePath the path to the file.
+     * @return the first line of the file as a String
+     * @throws IOException
+     */
+    public String readFirstLineOfFile(String filePath) throws IOException {
+        BufferedReader fileReader = new BufferedReader(new FileReader(filePath));
+        return fileReader.readLine();
+    }
+
+    /**
+     * Helpmethod for creating a JSONObject from the logfile.
+     * @param logReader
+     * @return JSONObject with log
+     * @throws IOException
+     */
+    public JSONObject createJSONLog(BufferedReader logReader) throws IOException {
+        StringBuilder log = new StringBuilder();
+        String s;
+        JSONObject logObject = new JSONObject();
+        Boolean fail = false;
+        while ((s = logReader.readLine()) != null) {
+            log.append(s);
+            log.append("\n");
+            if(s.matches("^\\[ERROR\\].*")  && !fail) {
+                fail = true;
+                logObject.put("status", "fail");
+            };
+        }
+        if (!fail) {
+            logObject.put("status", "pass");
+        }
+        logObject.put("log", log.toString());
+        return logObject;
+    }
+
+
+
+    /**
      * Checks and parses the data from the webhook into a JSON object.
      * @param request
      * @return JSONObject is an object with all the parsed data.
@@ -91,7 +138,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
         String requestData = request.getReader().lines().collect(Collectors.joining());
         JSONObject object = (JSONObject) new JSONParser().parse(requestData);
-        System.out.println("RequestInfo = " + object.toJSONString());
         return object;
     }
 
@@ -229,32 +275,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         File logFile = new File("log.txt");
         BufferedReader logReader = new BufferedReader(new FileReader(logFile));
         JSONObject logObject = createJSONLog(logReader);
-        return logObject;
-    }
-
-    /**
-     * Helpmethod for creating a JSONObject from the logfile.
-     * @param logReader
-     * @return JSONObject with log
-     * @throws IOException
-     */
-    public JSONObject createJSONLog(BufferedReader logReader) throws IOException {
-        StringBuilder log = new StringBuilder();
-        String s;
-        JSONObject logObject = new JSONObject();
-        Boolean fail = false;
-        while ((s = logReader.readLine()) != null) {
-            log.append(s);
-            log.append("\n");
-            if(s.matches("^\\[ERROR\\].*")  && !fail) {
-                fail = true;
-                logObject.put("status", "fail");
-            };
-        }
-        if (!fail) {
-            logObject.put("status", "pass");
-        }
-        logObject.put("log", log.toString());
         return logObject;
     }
 

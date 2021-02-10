@@ -11,10 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -129,5 +126,28 @@ class ContinuousIntegrationServerTest {
         CIS.cleanUpFromCloneAndBuild();
         assertFalse(Files.exists(Paths.get("Git")));
         assertFalse(Files.exists(Paths.get("log.txt")));
+    }
+    //Test that the readFirstLineOfFile works
+    @Test
+    void readFirstLineOfFileCorrect() {
+        File testFile = new File("test.txt");
+        String testString = "Testing.";
+        try {
+            FileWriter fWriter = new FileWriter(testFile);
+            fWriter.write(testString);
+            fWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
+        try {
+            assertEquals(testString, CIS.readFirstLineOfFile("test.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //delete the test file
+        testFile.delete();
+
     }
 }

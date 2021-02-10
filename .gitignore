@@ -1,6 +1,6 @@
 # Compiled class file
 *.class
-
+token.txt
 target/
 CI_server.iml
 Git/
