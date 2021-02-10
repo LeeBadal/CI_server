@@ -243,8 +243,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Helpmethod for creating a JSONObject from the logfile.
      * @param logReader
      * @return JSONObject with log
@@ -255,12 +253,20 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         String s;
         JSONObject logObject = new JSONObject();
         Boolean fail = false;
+        Boolean buildSuccess = false;
         while ((s = logReader.readLine()) != null) {
             log.append(s);
-            log.append("\n");
+            log.append("\\n");
+            if (s.matches("^\\[INFO\\]  T E S T S.*") && !fail) {
+                buildSuccess = true;
+            }
             if(s.matches("^\\[ERROR\\].*")  && !fail) {
                 fail = true;
-                logObject.put("state", "failure");
+                if (buildSuccess) {
+                    logObject.put("state", "test_failure");
+                } else {
+                    logObject.put("state", "build_failure");
+                }
             };
         }
         if (!fail) {
@@ -271,7 +277,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
->>>>>>> main
      * Cleans up the repo from "log.txt" and "Git" directory after Clone and Build methods.
      * @return void
      */
