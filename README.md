@@ -60,7 +60,9 @@ All contributors have been part of the process such as code comments, system des
 - expr.link maintainer
 
 ###### Daniel Grunler
-
+- Methods related to updating Github status
+- insertDB method
+- Handling personal access token/authorization
 
 ###### Matilda Rosenlew
 - Pairprogrammed with Andreas Henriksson
