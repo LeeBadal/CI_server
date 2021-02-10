@@ -82,24 +82,37 @@ public class ContinuousIntegrationServerTest {
         assertEquals(gitTargetURL, CIS.createURL(object, token));
     }
 
-    ///Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
+    //Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
     @Test
-    void readLogFileFailTest() throws IOException {
+    void readLogFileFailBuildTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
+        String logWithEscape = "[INFO] Scanning for projects...\\n[ERROR] Failed to execute goal\\n[ERROR] -> [Help 1]\\n";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
-        assertEquals("failure", logObject.get("state"));
-        assertEquals(log, logObject.get("log"));
+        assertEquals("build_failure", logObject.get("state"));
+        assertEquals(logWithEscape, logObject.get("log"));
+    }
+
+    //Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
+    @Test
+    void readLogFileFailTestTest() throws IOException {
+        String log = "[INFO] Scanning for projects...\n[INFO]  T E S T S\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
+        String logWithEscape = "[INFO] Scanning for projects...\\n[INFO]  T E S T S\\n[ERROR] Failed to execute goal\\n[ERROR] -> [Help 1]\\n";
+        BufferedReader reader = new BufferedReader(new StringReader(log));
+        JSONObject logObject = CIS.createJSONLog(reader);
+        assertEquals("test_failure", logObject.get("state"));
+        assertEquals(logWithEscape, logObject.get("log"));
     }
 
     //Check that createJSONlog sets status to pass when there are no errors, and that the log is correct.
     @Test
     void readLogFilePassTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[INFO] BUILD SUCCESS\n[INFO] Total time:  4.306 s\n";
+        String logWithEscape = "[INFO] Scanning for projects...\\n[INFO] BUILD SUCCESS\\n[INFO] Total time:  4.306 s\\n";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("success", logObject.get("state"));
-        assertEquals(log, logObject.get("log"));
+        assertEquals(logWithEscape, logObject.get("log"));
     }
 
     //Test that the createStatus method returns the correct object when the tests fail.
