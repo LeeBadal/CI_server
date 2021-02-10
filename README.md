@@ -71,7 +71,11 @@ All contributors have been part of the process such as code comments, system des
 - Cleanup
 
 ###### Andreas Henriksson
-
+- Pairprogrammed with Matilda Rosenlew
+- Clone method
+- Build and Test methods
+- Cleanup
+- JavaDoc
  
 ###### Olle Hovmark
 
