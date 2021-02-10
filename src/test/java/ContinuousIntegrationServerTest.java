@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests the ContinuousIntegrationServer class methods.
  */
-class ContinuousIntegrationServerTest {
+public class ContinuousIntegrationServerTest {
 
     private HttpServletRequest request;
     private ContinuousIntegrationServer CIS;
