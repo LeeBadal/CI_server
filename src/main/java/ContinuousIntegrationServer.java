@@ -115,7 +115,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     private void notifyBrowser(JSONObject githubData, String evaluationStatus) throws IOException, InterruptedException {
-        String token; //TODO: hidden variable in file
+        String token = "token"; //TODO: hidden variable in file
         String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus = createStatus(evaluationStatus);
         System.out.println(commitStatus);
