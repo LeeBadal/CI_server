@@ -82,37 +82,37 @@ public class ContinuousIntegrationServerTest {
         assertEquals(gitTargetURL, CIS.createURL(object, token));
     }
 
-    //Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
+    //Check that createJSONlog sets status to fail when there are build errors, and that the log is correct.
     @Test
     void readLogFileFailBuildTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
-        String logWithEscape = "[INFO] Scanning for projects...\\n[ERROR] Failed to execute goal\\n[ERROR] -> [Help 1]\\n";
+        String logWithBR = "[INFO] Scanning for projects...<br/>[ERROR] Failed to execute goal<br/>[ERROR] -> [Help 1]<br/>";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("build_failure", logObject.get("state"));
-        assertEquals(logWithEscape, logObject.get("log"));
+        assertEquals(logWithBR, logObject.get("log"));
     }
 
-    //Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
+    //Check that createJSONlog sets status to fail when there are test errors, and that the log is correct.
     @Test
     void readLogFileFailTestTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[INFO]  T E S T S\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
-        String logWithEscape = "[INFO] Scanning for projects...\\n[INFO]  T E S T S\\n[ERROR] Failed to execute goal\\n[ERROR] -> [Help 1]\\n";
+        String logWithBR = "[INFO] Scanning for projects...<br/>[INFO]  T E S T S<br/>[ERROR] Failed to execute goal<br/>[ERROR] -> [Help 1]<br/>";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("test_failure", logObject.get("state"));
-        assertEquals(logWithEscape, logObject.get("log"));
+        assertEquals(logWithBR, logObject.get("log"));
     }
 
     //Check that createJSONlog sets status to pass when there are no errors, and that the log is correct.
     @Test
     void readLogFilePassTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[INFO] BUILD SUCCESS\n[INFO] Total time:  4.306 s\n";
-        String logWithEscape = "[INFO] Scanning for projects...\\n[INFO] BUILD SUCCESS\\n[INFO] Total time:  4.306 s\\n";
+        String logWithBR = "[INFO] Scanning for projects...<br/>[INFO] BUILD SUCCESS<br/>[INFO] Total time:  4.306 s<br/>";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("success", logObject.get("state"));
-        assertEquals(logWithEscape, logObject.get("log"));
+        assertEquals(logWithBR, logObject.get("log"));
     }
 
     //Test that the createStatus method returns the correct object when the tests fail.
