@@ -46,38 +46,38 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         JSONObject requestInfo = null;
         File localRepo = null;
-        try {
-            requestInfo = validateRequest(request);
-            JSONObject ciResults = new JSONObject();
-            ciResults.put("state", "success");
-            ciResults.put("log", "Logging operation successful.");
 
-            if(requestInfo==null) return;
+        if(request.getMethod().equals("GET")) response.sendRedirect("http://expr.link/builds/list/all");
+        else {
+            try {
+                requestInfo = validateRequest(request);
+                JSONObject ciResults = new JSONObject();
+                ciResults.put("state", "success");
+                ciResults.put("log", "Logging operation successful.");
 
-            //Unpack requestInfo to strings used in cloneProject
-            String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
-            String ref = (String) requestInfo.get("ref");
-            String branch = ref.substring(ref.lastIndexOf("/")+1);
+                if (requestInfo == null) return;
 
-            localRepo = cloneProject(git_https, branch);
-            if (localRepo == null) return;
+                //Unpack requestInfo to strings used in cloneProject
+                String git_https = (String) ((JSONObject) requestInfo.get("repository")).get("clone_url");
+                String ref = (String) requestInfo.get("ref");
+                String branch = ref.substring(ref.lastIndexOf("/") + 1);
 
-            notifyBrowser(requestInfo, "pending");
-            buildAndTestProject(localRepo);
-            insertDB(requestInfo, ciResults);
+                localRepo = cloneProject(git_https, branch);
+                if (localRepo == null) return;
 
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                notifyBrowser(requestInfo, "pending");
+                buildAndTestProject(localRepo);
+                insertDB(requestInfo, ciResults);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (GitAPIException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+
+            }
         }
-
-        response.getWriter().println("CI job done");
-
-        cleanUpFromCloneAndBuild();
-
     }
 
     /**
@@ -91,7 +91,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         if(!request.getMethod().equals("POST") || request.getHeader("X-GitHub-Event").equals(null) || !request.getHeader("X-GitHub-Event").equals("push")) return null;
         String requestData = request.getReader().lines().collect(Collectors.joining());
         JSONObject object = (JSONObject) new JSONParser().parse(requestData);
-        System.out.println("RequestInfo = " + object.toJSONString());
         return object;
     }
 
