@@ -1,27 +1,15 @@
 import org.json.simple.JSONObject;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Random;
-
 import static org.junit.Assert.*;
-//TODO research appropiate testing method
+
+/**
+ *  Tests the Http class methods.
+ */
 public class HttpTest {
     Utils util = new Utils();
 
-    @Before
-    public void setUp() throws Exception {
-
-
-
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
     /**
     Make a post request to the DB. responses is test by check code 200
     The DB insertion can be verified by going to http://www.expr.link/builds/list/all. View Date for specific test.

@@ -3,10 +3,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -17,16 +15,20 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests the ContinuousIntegrationServer class methods.
+ */
 class ContinuousIntegrationServerTest {
 
     private HttpServletRequest request;
+    private ContinuousIntegrationServer CIS;
 
     @BeforeEach
     void setUp() throws IOException {
+        CIS = new ContinuousIntegrationServer();
         request = new Mockito().mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("X-GitHub-Event")).thenReturn("push");
@@ -39,7 +41,6 @@ class ContinuousIntegrationServerTest {
      */
     @Test
     void validateRequestTrue() {
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         try {
             assertTrue(CIS.validateRequest(request) instanceof JSONObject);
         } catch (IOException e) {
@@ -56,7 +57,6 @@ class ContinuousIntegrationServerTest {
      */
     @Test
     void validateRequestFalse() throws IOException, ParseException {
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         when(request.getMethod()).thenReturn("GET");
         assertNull(CIS.validateRequest(request));
     }
@@ -64,7 +64,6 @@ class ContinuousIntegrationServerTest {
     //Testing if the cloned file exists.
     @Test
     void cloneProjectTrue() throws GitAPIException, IOException {
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         File file = CIS.cloneProject("https://github.com/LeeBadal/CI_server.git", "main");
         assertNotNull(file);
     }
@@ -82,7 +81,6 @@ class ContinuousIntegrationServerTest {
         object.put("repository",repo);
         object.put("head_commit", headCommit);
         String token = "5e94ab893ade18b1304dc04dc41f0e384b94be5f";
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         String gitTargetURL = "https://api.github.com/repos/LeeBadal/CI_webhook/statuses/ff674cb9a662dd565040618ee8a9cb3031d4a2f3?access_token=5e94ab893ade18b1304dc04dc41f0e384b94be5f";
         assertEquals(gitTargetURL, CIS.createURL(object, token));
     }
@@ -90,7 +88,6 @@ class ContinuousIntegrationServerTest {
     ///Check that createJSONlog sets status to fail when there are errors, and that the log is correct.
     @Test
     void readLogFileFailTest() throws IOException {
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         String log = "[INFO] Scanning for projects...\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
@@ -101,7 +98,6 @@ class ContinuousIntegrationServerTest {
     //Check that createJSONlog sets status to pass when there are no errors, and that the log is correct.
     @Test
     void readLogFilePassTest() throws IOException {
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         String log = "[INFO] Scanning for projects...\n[INFO] BUILD SUCCESS\n[INFO] Total time:  4.306 s\n";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
@@ -112,7 +108,6 @@ class ContinuousIntegrationServerTest {
     //Test that the createStatus method returns the correct object when the tests fail.
     @Test
     void createStatusTestFailureTest() {
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         JSONObject testObj = new JSONObject();
         String inputStatus = "test_failure";
         testObj.put("state", "failure");
@@ -125,7 +120,6 @@ class ContinuousIntegrationServerTest {
     void cleanUpFromCloneAndBuildTrue() throws IOException {
         new File("Git").mkdir();
         new File("log.txt").createNewFile();
-        ContinuousIntegrationServer CIS = new ContinuousIntegrationServer();
         CIS.cleanUpFromCloneAndBuild();
         assertFalse(Files.exists(Paths.get("Git")));
         assertFalse(Files.exists(Paths.get("log.txt")));

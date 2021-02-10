@@ -1,11 +1,19 @@
 import java.util.Random;
-//class to generate random string of length 50, used for testing HTTP post where SHA is needed.
+
+/**
+ * class to generate random string of length 50, used for testing HTTP post where SHA is needed.
+ */
 public class Utils {
     String asciiUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String asciiLowerCase = asciiUpperCase.toLowerCase();
     String digits = "1234567890";
     String seedChars = asciiUpperCase + asciiLowerCase + digits;
     int length = 50;
+
+    /**
+     * Generates random string of length 50.
+     * @return a string.
+     */
     public String generateRandomString() {
         StringBuilder sb = new StringBuilder();
         int i = 0;
