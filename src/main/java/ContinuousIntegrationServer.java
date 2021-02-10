@@ -54,7 +54,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
             localRepo = cloneProject(git_https, branch);
             if (localRepo == null) return;
-
+            notifyBrowser(requestInfo, "pending");
             buildProject(localRepo);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -65,7 +65,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
 
         testProject(new File("path")); //TODO: add path.
-
+        
         response.getWriter().println("CI job done");
 
         cleanUpFromCloneAndBuild();
