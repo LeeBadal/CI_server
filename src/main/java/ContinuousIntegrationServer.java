@@ -2,7 +2,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -197,6 +199,44 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
 
         return object;
+    }
+
+    /**
+     * Method for reading the log-file and creating a JSONObject with the results
+     * @return JSONObject with log
+     * @throws IOException
+     */
+    public JSONObject readLogFile() throws IOException {
+        File logFile = new File("log.txt");
+        BufferedReader logReader = new BufferedReader(new FileReader(logFile));
+        JSONObject logObject = createJSONLog(logReader);
+        return logObject;
+    }
+
+    /**
+     * Helpmethod for creating a JSONObject from the logfile.
+     * @param logReader
+     * @return JSONObject with log
+     * @throws IOException
+     */
+    public JSONObject createJSONLog(BufferedReader logReader) throws IOException {
+        StringBuilder log = new StringBuilder();
+        String s;
+        JSONObject logObject = new JSONObject();
+        Boolean fail = false;
+        while ((s = logReader.readLine()) != null) {
+            log.append(s);
+            log.append("\n");
+            if(s.matches("^\\[ERROR\\].*")  && !fail) {
+                fail = true;
+                logObject.put("status", "fail");
+            };
+        }
+        if (!fail) {
+            logObject.put("status", "pass");
+        }
+        logObject.put("log", log.toString());
+        return logObject;
     }
 
     /**
