@@ -1,5 +1,6 @@
 import org.json.simple.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.time.Instant;
 import static org.junit.Assert.*;
