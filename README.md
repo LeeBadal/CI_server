@@ -1,7 +1,7 @@
 # DD2480-Assignment #2: CI Server
 ### Group 3, Spring 2021
 
-CI Server is created for the assignment 'Continuous Integration' in the course DD2480 at KTH. The Program runs a server which has a listner for webhooks. Webhooks from GitHub's commits is concidered valid and is further processed. In the process, the project of the commit is being built, tested and evaluated to later update the commit status and a database.
+CI Server is created for the assignment 'Continuous Integration' in the course DD2480 at KTH. The Program runs a server which has a listener for webhooks. Webhooks from GitHub's commits are considered valid and is further processed. In the process the project is built, tested and evaluated to later notify the user via GitHub statuses. Build and test results are stored in an external database for a history overview.
 
 Travis build status:
 [![Build Status](https://www.travis-ci.com/LeeBadal/CI_server.svg?token=7cmhVzehZexnVyrntj3T&branch=main)](https://www.travis-ci.com/LeeBadal/CI_server)
@@ -10,8 +10,9 @@ CI_server build list:
 [http://www.expr.link/img/expr-link.png](http://expr.link/builds/list/all)
 
 ### How to run your CI_server
+- git clone/download this repo
 - First you need to create a [PAT](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token), this is so that your commit status can be updated. NOTE: The status updates will be set by the PAT's user (make sure you have check the boxes for repo authorization).
-- Save the generated PAT in a file called token.txt in the root folder of the 
+- Save the generated PAT in a file called token.txt in the root folder of the project.
 - Using an IDE you can right click on the file ContinousIntegrationServer.java and run this file the server will run locally. The CI_server runs by default on port 8080.
 - To allow GitHub to interact with the server you will have to either configurate your network settings or use a tunneling service such as [Ngrok](https://ngrok.com/).
 
@@ -54,6 +55,7 @@ All contributors have been part of the process such as code comments, system des
 - Team Leader
 - http methods
 - insertDB method
+- expr.link maintainer
 
 ###### Daniel Grunler
 
