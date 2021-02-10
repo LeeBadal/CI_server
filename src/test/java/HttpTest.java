@@ -1,5 +1,6 @@
 import org.json.simple.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.time.Instant;
 import static org.junit.Assert.*;
@@ -15,7 +16,7 @@ public class HttpTest {
     The DB insertion can be verified by going to http://www.expr.link/builds/list/all. View Date for specific test.
      **/
     @Test
-    public void makePostDBInsert() throws IOException, InterruptedException {
+    void makePostDBInsert() throws IOException, InterruptedException {
         String targetURL = "https://expr-link.herokuapp.com/CI_Server";
         JSONObject body = new JSONObject();
         String randomString = util.generateRandomString();
@@ -27,8 +28,5 @@ public class HttpTest {
         body.put("log","big log this is what happened yada yada");
         assertEquals(200,Http.makePost(targetURL,body));
     }
-
-
-
 
 }

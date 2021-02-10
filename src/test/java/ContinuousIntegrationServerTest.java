@@ -153,7 +153,7 @@ public class ContinuousIntegrationServerTest {
             e.printStackTrace();
         }
 
-        //delete the test file
+        //delete the test file.
         testFile.delete();
 
     }
