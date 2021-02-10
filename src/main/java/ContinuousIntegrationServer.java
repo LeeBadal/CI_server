@@ -219,6 +219,10 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                 //TODO: add extra test information if possible
                 object.put("description","The commit failed at the test stage.");
                 break;
+            case "error":
+                object.put("state","error");
+                object.put("description", "The CI server has experienced an error.");
+                break;
             default:
                 object.put("state","pending");
                 object.put("description","CI test status unknown.");
