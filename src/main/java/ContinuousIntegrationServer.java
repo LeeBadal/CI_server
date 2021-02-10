@@ -31,11 +31,10 @@ import org.json.simple.parser.ParseException;
  See the Jetty documentation for API documentation of those classes.
  */
 public class ContinuousIntegrationServer extends AbstractHandler {
-
+    private String personalAccessToken;
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
@@ -44,14 +43,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         JSONObject requestInfo = null;
         File localRepo = null;
-
         if(request.getMethod().equals("GET")) response.sendRedirect("http://expr.link/builds/list/all");
         else {
             try {
                 requestInfo = validateRequest(request);
                 JSONObject ciResults = new JSONObject();
-                ciResults.put("state", "success");
-                ciResults.put("log", "Logging operation successful.");
 
                 if (requestInfo == null) return;
 
@@ -77,6 +73,17 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Returns the first line of a file as a String.
+     * @param filePath the path to the file.
+     * @return the first line of the file as a String
+     * @throws IOException
+     */
+    public String readFirstLineOfFile(String filePath) throws IOException {
+        BufferedReader fileReader = new BufferedReader(new FileReader(filePath));
+        return fileReader.readLine();
     }
 
     /**
@@ -134,7 +141,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
      * @throws InterruptedException
      */
     private void notifyBrowser(JSONObject githubData, String evaluationStatus) throws IOException, InterruptedException {
-        String token = "token"; //TODO: hidden variable in file
+
+        String token = readFirstLineOfFile("token.txt");
         String gitTargetURL = createURL(githubData, token);
         JSONObject commitStatus = createStatus(evaluationStatus);
         System.out.println(commitStatus);
@@ -231,6 +239,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
+<<<<<<< HEAD
+=======
      * Helpmethod for creating a JSONObject from the logfile.
      * @param logReader
      * @return JSONObject with log
@@ -257,6 +267,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
+>>>>>>> main
      * Cleans up the repo from "log.txt" and "Git" directory after Clone and Build methods.
      * @return void
      */
