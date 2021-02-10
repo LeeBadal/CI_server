@@ -86,7 +86,7 @@ public class ContinuousIntegrationServerTest {
     @Test
     void readLogFileFailBuildTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
-        String logWithBR = "[INFO] Scanning for projects...<br/>[ERROR] Failed to execute goal<br/>[ERROR] -> [Help 1]<br/>";
+        String logWithBR = "[INFO] Scanning for projects...<br>[ERROR] Failed to execute goal<br>[ERROR] -> [Help 1]<br>";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("build_failure", logObject.get("state"));
@@ -97,7 +97,7 @@ public class ContinuousIntegrationServerTest {
     @Test
     void readLogFileFailTestTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[INFO]  T E S T S\n[ERROR] Failed to execute goal\n[ERROR] -> [Help 1]\n";
-        String logWithBR = "[INFO] Scanning for projects...<br/>[INFO]  T E S T S<br/>[ERROR] Failed to execute goal<br/>[ERROR] -> [Help 1]<br/>";
+        String logWithBR = "[INFO] Scanning for projects...<br>[INFO]  T E S T S<br>[ERROR] Failed to execute goal<br>[ERROR] -> [Help 1]<br>";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("test_failure", logObject.get("state"));
@@ -108,7 +108,7 @@ public class ContinuousIntegrationServerTest {
     @Test
     void readLogFilePassTest() throws IOException {
         String log = "[INFO] Scanning for projects...\n[INFO] BUILD SUCCESS\n[INFO] Total time:  4.306 s\n";
-        String logWithBR = "[INFO] Scanning for projects...<br/>[INFO] BUILD SUCCESS<br/>[INFO] Total time:  4.306 s<br/>";
+        String logWithBR = "[INFO] Scanning for projects...<br>[INFO] BUILD SUCCESS<br>[INFO] Total time:  4.306 s<br>";
         BufferedReader reader = new BufferedReader(new StringReader(log));
         JSONObject logObject = CIS.createJSONLog(reader);
         assertEquals("success", logObject.get("state"));
