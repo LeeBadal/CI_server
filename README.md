@@ -93,5 +93,3 @@ All contributors have been part of the process such as code comments, system des
 - Fixing method calls from handle function
 - Dynamic URL handling
   
- 
-  
