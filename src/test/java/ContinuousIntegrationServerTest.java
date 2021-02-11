@@ -55,7 +55,7 @@ public class ContinuousIntegrationServerTest {
     @Test
     void validateRequestFalse() throws IOException, ParseException {
         when(request.getMethod()).thenReturn("GET");
-        assertNull(CIS.validateRequest(request));
+        assertNotNull(CIS.validateRequest(request));
     }
 
     //Testing if the cloned file exists.
